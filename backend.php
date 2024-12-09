@@ -47,7 +47,11 @@ if ($action === "addBug" && $_SERVER['REQUEST_METHOD'] === "POST") {
         http_response_code(500);
     }
 } elseif ($action === "getBugs" && $_SERVER['REQUEST_METHOD'] === "GET") {
-    $result = $conn->query("SELECT id, description, severity, date, username FROM bugs WHERE username = '" . $_COOKIE["username"] . "'");
+    $result = $conn->prepare("SELECT id, description, severity, date, username FROM bugs WHERE username = ?");
+    $result->bind_param("s", $_COOKIE["username"]);
+    $result->execute();
+    $result = $result->get_result();
+
     $bugs = $result->fetch_all(MYSQLI_ASSOC);
     echo json_encode($bugs);
 } else {
