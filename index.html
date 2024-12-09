@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Bug reporting Tool</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <p>Angemeldet als:</p>
+        <p><strong id="username"></strong></p>
+        <canvas id="logoCanvas" width="300" height="300"></canvas>
+        <h1>Bug reporting Tool</h1>
+        <nav>
+            <ul>
+                <li><a href="#information-section">Information</a></li>
+                <li><a href="#input-section">Input</a></li>
+                <li><a href="#output-section">Output</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="information-section" class="w3-row">
+            <div class="w3-col w3-center m3">
+                <h2>Was macht diese Applikation?</h2>
+                <p>
+                    Diese Applikation dient dazu Bugs zu melden.
+                </p>
+            </div>
+            <img class="w3-col w3-center m3" src="./assets/types-of-severity.png" alt="Typen von Bug Schweregraden" width="332" height="402">
+        </section>
+
+        <section id="input-section">
+            <h2>Melde einen Bug</h2>
+            <form id="bug-form">
+                <label for="description">Detaillierter Bugbeschrieb:</label>
+                <textarea id="description" name="description" required></textarea>
+                <p id="description-error" class="w3-text-red"></p>
+                <label for="severity">Schweregrad (1 Kritisch - 5 Kosmetisch):</label>
+                <input type="number" id="severity" name="severity" min="1" max="5" required>
+                <p id="severity-error" class="w3-text-red"></p>
+                <label for="date">Wann ist der Bug das letzte Mal aufgetreten?</label>
+                <input type="date" id="date" name="date" required>
+                <p id="date-error" class="w3-text-red"></p>
+                <button type="submit">Bug Melden</button>
+            </form>
+        </section>
+
+        <section id="output-section">
+            <h2>Bereits gemeldete Bugs</h2>
+            <div id="bugs-container"></div>
+        </section>
+    </main>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
