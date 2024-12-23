@@ -24,14 +24,20 @@ function validateRequest($request) {
     validate(isset($request['date']), 'Property "date" is required', 400);
 }
 
-$conn = mysqli_connect($host, $user, $pass, $db);
-validate($conn, 'Database connection failed', 500);
-
 // Handle requests
 $action = $_GET['action'] ?? '';
+$method = $_SERVER['REQUEST_METHOD'];
 $data = json_decode(file_get_contents("php://input"), true);
 
-if ($action === "addBug" && $_SERVER['REQUEST_METHOD'] === "POST") {
+try {
+    $conn = mysqli_connect($host, $user, $pass, $db);
+} catch (Exception $e) {
+    echo json_encode(['message' => 'Database connection failed']);
+    http_response_code(500);
+    exit;
+}
+
+if ($action === "addBug" && $method === "POST") {
     validateRequest($data);
     $description = $data['description'] ?? '';
     $severity = $data['severity'] ?? '';
@@ -41,12 +47,12 @@ if ($action === "addBug" && $_SERVER['REQUEST_METHOD'] === "POST") {
     $stmt = $conn->prepare("INSERT INTO bugs (description, severity, date, username) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("siss", $description, $severity, $date, $username);
     if ($stmt->execute()) {
-        echo json_encode(["message" => 'Bug added successfully']);
+        echo json_encode(["message" => 'Bug wurde erfolgreich hinzugefügt']);
     } else {
-        echo json_encode(["message" => 'An unexpected error occurred']);
+        echo json_encode(["message" => 'Fehler beim Hinzufügen des Bugs']);
         http_response_code(500);
     }
-} elseif ($action === "getBugs" && $_SERVER['REQUEST_METHOD'] === "GET") {
+} elseif ($action === "getBugs" && $method === "GET") {
     $result = $conn->prepare("SELECT id, description, severity, date, username FROM bugs WHERE username = ?");
     $result->bind_param("s", $_COOKIE["username"]);
     $result->execute();

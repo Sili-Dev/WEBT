@@ -1,15 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
     const bugForm = document.getElementById("bug-form");
     const bugsContainer = document.getElementById("bugs-container");
-    const userCookie = document.cookie;
-    if (!userCookie.includes("username")) {
-        let username = ''
-        while (username === '' || username === null || username.length > 50) {
-            username = prompt("Bitte geben Sie Ihren Username ein: (max 50 Zeichen)").trim();
+    const indexOfKey = document.cookie.split("=").findIndex((element) => element.includes('username'));
+    let username = document.cookie.split("=")[indexOfKey + 1];
+    if (!username) {
+        while (username === '' || username === null || username === undefined || username?.length > 50) {
+            username = prompt("Bitte geben Sie Ihren Username ein: (max 50 Zeichen)")?.trim();
         }
         document.cookie = `username=${username}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict`;
     }
-    document.getElementById("username").innerText = document.cookie.split("=")[1];
+
+    document.getElementById("username").innerText = username;
 
     bugForm.addEventListener("input", event => {
         if (event.target.id === "description") {
@@ -54,22 +55,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ action: "addBug", ...data }),
             });
             const result = await response.json();
+            console.log(result);
             if (response.status === 200) {
                 alert(result.message);
                 loadBugs();
                 bugForm.reset();
             } else {
                 console.error("Error adding bug:", result);
-                alert(result.message);
+                alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
             }
         } catch (error) {
             console.error("Error:", error);
+            alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
         }
     });
 
     async function loadBugs() {
         try {
             const response = await fetch("backend.php?action=getBugs");
+            if (response?.status !== 200) {
+                throw new Error("Fehler beim Laden der Bugs: " + response);
+            }
             const bugs = await response.json();
             bugsContainer.innerHTML = bugs.map(bug => `
                 <div class="bug">
@@ -81,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `).join("");
         } catch (error) {
             console.error("Error loading bugs:", error);
+            alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
         }
     }
 
